@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+httpx
+pydantic
+pydantic-settings
+python-dotenv
+sqlalchemy
+psycopg[binary]
+alembic
+typer
+PyYAML

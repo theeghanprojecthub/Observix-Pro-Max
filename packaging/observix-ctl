@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<EOF
+observix-ctl - Observix service helper
+
+Usage:
+  observix-ctl status
+  observix-ctl start <control-plane|indexer|agent> [agent-id]
+  observix-ctl stop  <control-plane|indexer|agent> [agent-id]
+  observix-ctl restart <control-plane|indexer|agent> [agent-id]
+  observix-ctl logs <control-plane|indexer|agent> [agent-id]
+
+Examples:
+  observix-ctl status
+  observix-ctl start control-plane
+  observix-ctl start indexer
+  observix-ctl start agent agent-a
+  observix-ctl logs agent agent-a
+EOF
+}
+
+svc_name() {
+  local component="${1:-}"
+  local id="${2:-}"
+
+  case "$component" in
+    control-plane) echo "observix-control-plane.service" ;;
+    indexer) echo "observix-indexer.service" ;;
+    agent)
+      if [[ -z "$id" ]]; then
+        echo "Missing agent id (e.g., agent-a)" >&2
+        exit 1
+      fi
+      echo "observix-agent@${id}.service"
+      ;;
+    *) echo "Unknown component: $component" >&2; exit 1 ;;
+  esac
+}
+
+cmd="${1:-}"
+shift || true
+
+case "$cmd" in
+  status)
+    systemctl --no-pager status observix-control-plane.service || true
+    echo "----------------------------------------"
+    systemctl --no-pager status observix-indexer.service || true
+    echo "----------------------------------------"
+    systemctl --no-pager list-units "observix-agent@*.service" --no-pager || true
+    ;;
+  start|stop|restart)
+    component="${1:-}"; id="${2:-}"
+    systemctl "$cmd" "$(svc_name "$component" "$id")"
+    ;;
+  logs)
+    component="${1:-}"; id="${2:-}"
+    journalctl -u "$(svc_name "$component" "$id")" -f
+    ;;
+  help|--help|-h|"")
+    usage
+    ;;
+  *)
+    echo "Unknown command: $cmd" >&2
+    usage
+    exit 1
+    ;;
+esac

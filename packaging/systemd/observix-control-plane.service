@@ -1,0 +1,18 @@
+[Unit]
+Description=Observix Control Plane
+After=network.target
+Wants=network.target
+
+[Service]
+User=observix
+Group=observix
+ExecStart=/usr/local/bin/observix-control-plane -c /etc/observix/control-plane.yaml
+WorkingDirectory=/var/lib/observix
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
