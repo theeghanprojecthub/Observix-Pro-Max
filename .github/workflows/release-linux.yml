@@ -42,23 +42,19 @@ jobs:
           set -e
           rm -rf dist build *.spec
           mkdir -p dist/bin
-
-          # CLI
-          pyinstaller -F -n observix src/observix_cli/__main__.py
+      
+          pyinstaller -F -n observix -m observix_cli
           mv dist/observix dist/bin/observix
-
-          # Agent
-          pyinstaller -F -n observix-agent src/observix_agent/__main__.py
+      
+          pyinstaller -F -n observix-agent -m observix_agent
           mv dist/observix-agent dist/bin/observix-agent
-
-          # Control plane (your package has __main__.py)
-          pyinstaller -F -n observix-control-plane src/observix_control_plane/__main__.py
+      
+          pyinstaller -F -n observix-control-plane -m observix_control_plane
           mv dist/observix-control-plane dist/bin/observix-control-plane
-
-          # Indexer (your package has __main__.py)
-          pyinstaller -F -n observix-indexer src/observix_indexer/__main__.py
+      
+          pyinstaller -F -n observix-indexer -m observix_indexer
           mv dist/observix-indexer dist/bin/observix-indexer
-
+      
           chmod +x dist/bin/*
 
       - name: Assemble release bundle
