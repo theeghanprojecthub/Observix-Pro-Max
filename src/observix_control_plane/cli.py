@@ -3,9 +3,9 @@ from __future__ import annotations
 import typer
 import uvicorn
 
-from observix_common.config import load_yaml
-from observix_control_plane.api import Settings, create_app
-from observix_control_plane.db import init_engine
+from ..observix_common.config import load_yaml
+from ..observix_control_plane.api import Settings, create_app
+from ..observix_control_plane.db import init_engine
 
 app = typer.Typer(help="Observix Control Plane CLI")
 
