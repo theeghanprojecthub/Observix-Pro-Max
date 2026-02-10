@@ -1,9 +1,0 @@
-agent_id: "agent-us-1"
-region: "us-east-1"
-tenant_id: "demo"
-admin_port: 7401
-
-control_plane_url: "http://127.0.0.1:7000"
-poll_assignments_seconds: 3
-
-state_dir: "state/agent-us-1"

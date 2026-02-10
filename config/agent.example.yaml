@@ -1,7 +1,0 @@
-agent_id: agent-eu-1
-region: eu-west-1
-tenant_id: demo
-admin_port: 7301
-control_plane_url: http://127.0.0.1:7000
-poll_assignments_seconds: 3
-state_dir: state/agent-eu-1

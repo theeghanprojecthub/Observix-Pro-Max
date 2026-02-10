@@ -1,7 +1,0 @@
-agent_id: agent-a
-region: eu-west-1
-control_plane_url: http://127.0.0.1:7000
-admin_host: 127.0.0.1
-admin_port: 7301
-heartbeat_seconds: 5
-poll_seconds: 2
