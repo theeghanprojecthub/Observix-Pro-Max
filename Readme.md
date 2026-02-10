@@ -198,7 +198,8 @@ This is a common pattern for infra tools before publishing an apt repository.
 #### Install (example)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/<ORG>/<REPO>/main/packaging/install.sh | sudo bash
+
+curl -sSL -H "Authorization: token xxxxxxxxxx" https://raw.githubusercontent.com/theeghanprojecthub/Observix-Pro-Max/main/packaging/install.sh | sudo -E bash
 ```
 
 Installer responsibilities (expected):
@@ -373,9 +374,13 @@ Packaging default example:
 ```yaml
 host: 0.0.0.0
 port: 7000
-storage:
-  type: sqlite
-  path: /var/lib/observix/control-plane.db
+
+allow_origins:
+  - "*"
+
+agent_offline_threshold_seconds: 20
+
+database_url: "sqlite:////var/lib/observix/control-plane.db"
 ```
 
 Parameters:

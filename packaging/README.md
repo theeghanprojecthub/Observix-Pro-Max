@@ -136,14 +136,18 @@ sudo apt-get install -y curl jq
 2) Install Observix (downloads latest GitHub Release assets):
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/<ORG>/<REPO>/main/packaging/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/theeghanprojecthub/Observix-Pro-Max/main/packaging/install.sh | sudo bash
 ```
 
 If the repo is private, pass a GitHub token:
 
 ```bash
 export GITHUB_TOKEN="ghp_xxx..."
-curl -sSL https://raw.githubusercontent.com/<ORG>/<REPO>/main/packaging/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/theeghanprojecthub/Observix-Pro-Max/main/packaging/install.sh | sudo bash
+
+or
+
+curl -sSL -H "Authorization: token xxxxxxxxxx" https://raw.githubusercontent.com/theeghanprojecthub/Observix-Pro-Max/main/packaging/install.sh | sudo -E bash
 ```
 
 > The installer uses GitHub’s `releases/latest` API to find the newest tag and download assets.
