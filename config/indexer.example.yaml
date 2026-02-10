@@ -1,0 +1,3 @@
+host: 127.0.0.1
+port: 7100
+profiles_dir: observix_indexer/profiles

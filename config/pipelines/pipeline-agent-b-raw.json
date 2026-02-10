@@ -1,0 +1,22 @@
+{
+  "name": "syslog-5515-to-ec2-51-raw",
+  "enabled": true,
+  "spec": {
+    "source": {
+      "type": "syslog_udp",
+      "options": { "host": "127.0.0.1", "port": 5515, "max_queue_size": 50000 }
+    },
+    "processor": { "mode": "raw", "options": {} },
+    "destination": {
+      "type": "syslog_udp",
+      "options": {
+        "host": "ec2-51-21-3-162.eu-north-1.compute.amazonaws.com",
+        "port": 514,
+        "pri": 13,
+        "appname": "observix-agent-b"
+      }
+    },
+    "batch_max_events": 50,
+    "batch_max_seconds": 1.0
+  }
+}
