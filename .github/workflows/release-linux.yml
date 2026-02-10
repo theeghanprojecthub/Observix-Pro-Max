@@ -2,8 +2,6 @@ name: Release Linux Binaries
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*"
 
@@ -12,17 +10,14 @@ permissions:
 
 jobs:
   build-linux:
+    name: Build & Release (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            arch: amd64
-            py: "3.11"
-          - os: ubuntu-latest
-            arch: arm64
-            py: "3.11"
-
-    runs-on: ${{ matrix.os }}
+          - arch: amd64
 
     steps:
       - name: Checkout
@@ -31,7 +26,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.py }}
+          python-version: "3.11"
 
       - name: Install build deps
         run: |
@@ -45,23 +40,26 @@ jobs:
       - name: Build binaries (PyInstaller)
         run: |
           set -e
+          rm -rf dist build *.spec
           mkdir -p dist/bin
 
-          # CLI (module package has __main__.py)
-          pyinstaller -F -n observix -m observix_cli
+          # CLI
+          pyinstaller -F -n observix src/observix_cli/__main__.py
           mv dist/observix dist/bin/observix
 
-          # Agent (module package has __main__.py)
-          pyinstaller -F -n observix-agent -m observix_agent
+          # Agent
+          pyinstaller -F -n observix-agent src/observix_agent/__main__.py
           mv dist/observix-agent dist/bin/observix-agent
 
-          # Control plane (target a module that actually exists)
-          pyinstaller -F -n observix-control-plane -m observix_control_plane.cli
+          # Control plane (your package has __main__.py)
+          pyinstaller -F -n observix-control-plane src/observix_control_plane/__main__.py
           mv dist/observix-control-plane dist/bin/observix-control-plane
 
-          # Indexer (target a module that actually exists)
-          pyinstaller -F -n observix-indexer -m observix_indexer.cli
+          # Indexer (your package has __main__.py)
+          pyinstaller -F -n observix-indexer src/observix_indexer/__main__.py
           mv dist/observix-indexer dist/bin/observix-indexer
+
+          chmod +x dist/bin/*
 
       - name: Assemble release bundle
         run: |
@@ -90,11 +88,19 @@ jobs:
 
       - name: Create checksums
         run: |
-          sha256sum "observix-linux-${{ matrix.arch }}.tar.gz" >> sha256sums.txt
+          sha256sum "observix-linux-${{ matrix.arch }}.tar.gz" > "sha256sums-${{ matrix.arch }}.txt"
+          sha256sum dist/bin/observix >> "sha256sums-${{ matrix.arch }}.txt"
+          sha256sum dist/bin/observix-agent >> "sha256sums-${{ matrix.arch }}.txt"
+          sha256sum dist/bin/observix-control-plane >> "sha256sums-${{ matrix.arch }}.txt"
+          sha256sum dist/bin/observix-indexer >> "sha256sums-${{ matrix.arch }}.txt"
 
       - name: Upload assets to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
+            dist/bin/observix
+            dist/bin/observix-agent
+            dist/bin/observix-control-plane
+            dist/bin/observix-indexer
             observix-linux-${{ matrix.arch }}.tar.gz
-            sha256sums.txt
+            sha256sums-${{ matrix.arch }}.txt
