@@ -1,0 +1,29 @@
+{
+  "source": {
+    "type": "syslog_udp",
+    "options": {
+      "host": "0.0.0.0",
+      "port": 5514,
+      "max_queue_size": 50000
+    }
+  },
+  "processor": {
+    "mode": "indexed",
+    "options": {
+      "indexer_url": "http://127.0.0.1:7100",
+      "profile": "json_auto",
+      "timeout_seconds": 3
+    }
+  },
+  "destination": {
+    "type": "syslog_udp",
+    "options": {
+      "host": "example.com",
+      "port": 514,
+      "pri": 13,
+      "appname": "observix-agent"
+    }
+  },
+  "batch_max_events": 50,
+  "batch_max_seconds": 1.0
+}

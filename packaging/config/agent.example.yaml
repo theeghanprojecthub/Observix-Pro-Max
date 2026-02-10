@@ -1,0 +1,5 @@
+agent_id: agent-a
+region: eu-west-1
+
+control_plane:
+  url: http://127.0.0.1:7000

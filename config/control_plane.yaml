@@ -1,0 +1,4 @@
+host: "127.0.0.1"
+port: 7000
+db_path: "state/control_plane.sqlite3"
+admin_token: "dev-admin-token"  # replace later
