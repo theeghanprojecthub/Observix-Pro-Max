@@ -63,7 +63,8 @@ jobs:
 
       - name: Assemble release bundle
         run: |
-          set -e
+          set -euo pipefail
+
           BUNDLE="observix-linux-${{ matrix.arch }}"
           rm -rf "${BUNDLE}"
           mkdir -p "${BUNDLE}/bin" "${BUNDLE}/systemd" "${BUNDLE}/config" "${BUNDLE}/config/pipelines"
@@ -71,13 +72,62 @@ jobs:
           # Binaries
           cp -a dist/bin/* "${BUNDLE}/bin/"
 
-          # Packaging assets (match your repo structure)
+          # Systemd
           cp -a packaging/systemd/* "${BUNDLE}/systemd/"
-          cp -a packaging/config/control-plane.yaml "${BUNDLE}/config/"
-          cp -a packaging/config/indexer.yaml "${BUNDLE}/config/"
-          cp -a packaging/config/agent.example.yaml "${BUNDLE}/config/"
-          cp -a packaging/config/pipelines/* "${BUNDLE}/config/pipelines/"
 
+          pick_file () {
+            local out_var="$1"; shift
+            local found=""
+            for cand in "$@"; do
+              if [[ -f "$cand" ]]; then
+                found="$cand"
+                break
+              fi
+            done
+
+            if [[ -z "$found" ]]; then
+              echo "ERROR: none of these files exist:" >&2
+              printf '  - %s\n' "$@" >&2
+              echo "" >&2
+              echo "DEBUG: repo tree under packaging/config:" >&2
+              ls -la packaging/config || true
+              echo "" >&2
+              find packaging -maxdepth 4 -type f | sed 's/^/  - /' >&2 || true
+              exit 1
+            fi
+
+            printf -v "$out_var" '%s' "$found"
+          }
+
+          # Configs (support both hyphen and underscore filenames)
+          CP_CFG=""
+          IDX_CFG=""
+          AGENT_CFG=""
+
+          pick_file CP_CFG \
+            packaging/config/control-plane.yaml \
+            packaging/config/control_plane.yaml \
+            packaging/config/control-plane.yml \
+            packaging/config/control_plane.yml
+
+          pick_file IDX_CFG \
+            packaging/config/indexer.yaml \
+            packaging/config/indexer.yml
+
+          pick_file AGENT_CFG \
+            packaging/config/agent.example.yaml \
+            packaging/config/agent.example.yml
+
+          cp -a "$CP_CFG" "${BUNDLE}/config/control-plane.yaml"
+          cp -a "$IDX_CFG" "${BUNDLE}/config/indexer.yaml"
+          cp -a "$AGENT_CFG" "${BUNDLE}/config/agent.example.yaml"
+
+          # Pipelines
+          if [[ -d packaging/config/pipelines ]]; then
+            cp -a packaging/config/pipelines/* "${BUNDLE}/config/pipelines/" || true
+          fi
+
+          # Tools + docs
           cp -a packaging/install.sh "${BUNDLE}/install.sh"
           cp -a packaging/uninstall.sh "${BUNDLE}/uninstall.sh"
           cp -a packaging/observix-ctl "${BUNDLE}/observix-ctl"
@@ -85,6 +135,7 @@ jobs:
 
           chmod +x "${BUNDLE}/install.sh" "${BUNDLE}/uninstall.sh" "${BUNDLE}/observix-ctl"
           tar -czf "${BUNDLE}.tar.gz" "${BUNDLE}"
+
 
       - name: Create checksums
         run: |
