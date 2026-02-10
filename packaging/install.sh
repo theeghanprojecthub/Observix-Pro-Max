@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GITHUB_REPO="TheEghanProjectHub/observix-pro"
+GITHUB_REPO="theeghanprojecthub/Observix-Pro-Max"
 
 INSTALL_DIR="/opt/observix/bin"
 SYMLINK_DIR="/usr/local/bin"
